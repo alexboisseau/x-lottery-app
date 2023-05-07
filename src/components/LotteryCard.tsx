@@ -26,7 +26,6 @@ export const LotteryCard = () => {
   const [numberOfPlayers, setNumberOfPlayers] = useState<number>(0);
   const [waitingForTxValidation, setWaitingForTxValidation] =
     useState<boolean>(false);
-  const [lastUsedAddress, setLastUsedAddress] = useState<string>("");
 
   /** METHODS */
   const getLotteryContract = (
@@ -100,35 +99,40 @@ export const LotteryCard = () => {
   const buyTicket = async () => {
     if (!provider) return;
 
-    const signer = provider.getSigner();
-    const contract = getLotteryContract(signer);
+    try {
+      const signer = provider.getSigner();
+      const contract = getLotteryContract(signer);
 
-    if (!contract) return;
+      if (!contract) return;
 
-    setWaitingForTxValidation(true);
-    setLastUsedAddress(await signer.getAddress());
+      setWaitingForTxValidation(true);
 
-    const tx = await contract.enterLottery({
-      value: LOTTERY_ENTRANCE_FEE,
-    });
-
-    const myPromise = new Promise<void>((resolve, reject) => {
-      tx.wait().then((txResult: any) => {
-        if (txResult.status === 0) {
-          reject();
-        } else {
-          resolve();
-        }
-
-        setWaitingForTxValidation(false);
+      const tx = await contract.enterLottery({
+        value: LOTTERY_ENTRANCE_FEE,
       });
-    });
 
-    toast.promise(myPromise, {
-      loading: "Waiting transaction confirmation",
-      success: "Transaction confirmed !",
-      error: "Oops ... Transaction failed",
-    });
+      const myPromise = new Promise<void>((resolve, reject) => {
+        tx.wait().then((txResult: any) => {
+          console.log("transaction : ", txResult);
+          if (txResult.status === 0) {
+            reject();
+          } else {
+            resolve();
+          }
+
+          setWaitingForTxValidation(false);
+        });
+      });
+
+      toast.promise(myPromise, {
+        loading: "Waiting transaction confirmation",
+        success: "Transaction confirmed !",
+        error: "Oops ... Transaction failed",
+      });
+    } catch (error) {
+      console.log("Error during the tx signature");
+      setWaitingForTxValidation(false);
+    }
   };
 
   useEffect(() => {
