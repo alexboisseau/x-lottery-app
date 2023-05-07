@@ -1,11 +1,7 @@
 import "./App.css";
 
 const App = () => {
-  return (
-    <div className="App">
-      <button>Connect MetaMask</button>
-    </div>
-  );
+  return <div className="App">x-lottery</div>;
 };
 
 export default App;
