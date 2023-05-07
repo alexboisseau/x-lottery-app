@@ -1,0 +1,26 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 100vw;
+  min-height: 100vh;
+
+  .custom-toast {
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 2px;
+  }
+
+  .success-toast {
+    box-shadow: #b6ff99 3px 3px 0px;
+  }
+
+  .error-toast {
+    box-shadow: #ff9999 3px 3px 0px;
+  }
+
+  .loading-toast {
+    box-shadow: #99c9ff 3px 3px 0px;
+  }
+}
