@@ -19,6 +19,8 @@ const getWeb3Provider = (): ethers.providers.Web3Provider | null => {
 
 export const LotteryCard = () => {
   /** STATE VARIABLES */
+  const [hasEthereumExtension, setHasEthereumExtension] =
+    useState<boolean>(false);
   const [provider, setProvider] =
     useState<ethers.providers.Web3Provider | null>(null);
   const [recentWinner, setRecentWinner] = useState<string>("");
@@ -136,6 +138,9 @@ export const LotteryCard = () => {
   };
 
   useEffect(() => {
+    if (!window.ethereum) return;
+    setHasEthereumExtension(true);
+
     const provider = getWeb3Provider();
     if (provider === null) return;
     setProvider(provider);
@@ -168,31 +173,37 @@ export const LotteryCard = () => {
     <div className="lottery-card">
       <h1>Welcome to xLottery !</h1>
 
-      <div className="informations">
-        <p>
-          <span className="label">Recent winner :</span>{" "}
-          <span className="value">{recentWinner}</span>
-        </p>
-        <p>
-          <span className="label">Current balance :</span>{" "}
-          <span className="value">{lotteryBalance} ETH</span>
-        </p>
-        <p>
-          <span className="label">Number of players for this round :</span>{" "}
-          <span className="value">{numberOfPlayers}</span>
-        </p>
-      </div>
+      {hasEthereumExtension ? (
+        <>
+          <div className="informations">
+            <p>
+              <span className="label">Recent winner :</span>{" "}
+              <span className="value">{recentWinner}</span>
+            </p>
+            <p>
+              <span className="label">Current balance :</span>{" "}
+              <span className="value">{lotteryBalance} ETH</span>
+            </p>
+            <p>
+              <span className="label">Number of players for this round :</span>{" "}
+              <span className="value">{numberOfPlayers}</span>
+            </p>
+          </div>
 
-      {waitingForTxValidation ? (
-        <button className="buy-ticket-button">
-          <span>Waiting for the validation of the transaction ...</span>
-          <GiTicket />
-        </button>
+          {waitingForTxValidation ? (
+            <button className="buy-ticket-button">
+              <span>Waiting for the validation of the transaction ...</span>
+              <GiTicket />
+            </button>
+          ) : (
+            <button className="buy-ticket-button" onClick={buyTicket}>
+              <span>Buy ticket</span>
+              <GiTicket />
+            </button>
+          )}
+        </>
       ) : (
-        <button className="buy-ticket-button" onClick={buyTicket}>
-          <span>Buy ticket</span>
-          <GiTicket />
-        </button>
+        <p>Please install Metamask to use the dapp</p>
       )}
     </div>
   );
