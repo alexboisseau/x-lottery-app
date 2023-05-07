@@ -4,9 +4,33 @@
   border-radius: 2px;
   box-shadow: #9e98f6 4px 4px 0px;
 
-  padding: 30px 50px;
+  padding: 40px 50px;
 
-  .buy-ticket-button {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  & > h1,
+  & > p {
+    margin: 0;
+    padding: 0;
+  }
+
+  & > .informations {
+    & > p {
+      margin: 10px;
+
+      & > .label {
+        font-weight: 500;
+      }
+
+      & > .value {
+        font-style: italic;
+      }
+    }
+  }
+
+  & > .buy-ticket-button {
     background-color: #fff;
     border: 1px #000 solid;
     border-radius: 2px;

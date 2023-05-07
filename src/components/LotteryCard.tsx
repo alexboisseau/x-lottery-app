@@ -163,9 +163,21 @@ export const LotteryCard = () => {
   return (
     <div className="lottery-card">
       <h1>Welcome to xLottery !</h1>
-      <p>Recent winner : {recentWinner}</p>
-      <p>Current balance : {lotteryBalance} ETH</p>
-      <p>Number of players for this round : {numberOfPlayers} </p>
+
+      <div className="informations">
+        <p>
+          <span className="label">Recent winner :</span>{" "}
+          <span className="value">{recentWinner}</span>
+        </p>
+        <p>
+          <span className="label">Current balance :</span>{" "}
+          <span className="value">{lotteryBalance} ETH</span>
+        </p>
+        <p>
+          <span className="label">Number of players for this round :</span>{" "}
+          <span className="value">{numberOfPlayers}</span>
+        </p>
+      </div>
 
       {waitingForTxValidation ? (
         <button className="buy-ticket-button">
