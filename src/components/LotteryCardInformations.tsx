@@ -91,7 +91,7 @@ export const LotteryCardInformations = ({
         <span className="value">{recentWinner}</span>
       </p>
       <p>
-        <span className="label">Current balance :</span>{" "}
+        <span className="label">Lottery balance :</span>{" "}
         <span className="value">{lotteryBalance} ETH</span>
       </p>
       <p>
