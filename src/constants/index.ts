@@ -336,3 +336,6 @@ export const LOTTERY_CONTRACT_ABI = [
 export enum LOTTERY_CONTRACT_EVENTS {
   "LotteryEnter" = "LotteryEnter",
 }
+
+export const SEPOLIA_CHAIN_ID = 11155111;
+export const SEPOLIA_CHAIN_ID_HEX = "0xaa36a7";

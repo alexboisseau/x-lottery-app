@@ -5,6 +5,8 @@ import {
   LOTTERY_CONTRACT_ABI,
   LOTTERY_CONTRACT_ADDRESS,
   LOTTERY_ENTRANCE_FEE,
+  SEPOLIA_CHAIN_ID,
+  SEPOLIA_CHAIN_ID_HEX,
 } from "../constants";
 import { GiTicket } from "react-icons/gi";
 import { toast } from "react-hot-toast";
@@ -17,6 +19,13 @@ const getWeb3Provider = (): ethers.providers.Web3Provider | null => {
   const { ethereum } = window;
   const provider = new ethers.providers.Web3Provider(ethereum);
   return provider;
+};
+
+const switchNetwork = async () => {
+  await window.ethereum.request({
+    method: "wallet_switchEthereumChain",
+    params: [{ chainId: SEPOLIA_CHAIN_ID_HEX }],
+  });
 };
 
 export const LotteryCard = () => {
@@ -33,6 +42,16 @@ export const LotteryCard = () => {
     if (provider === null) return;
     setProvider(provider);
   }, []);
+
+  useEffect(() => {
+    if (!provider) return;
+
+    provider.getNetwork().then((network: ethers.providers.Network) => {
+      if (network.chainId !== SEPOLIA_CHAIN_ID) {
+        switchNetwork();
+      }
+    });
+  }, [provider]);
 
   return (
     <div className="lottery-card">
