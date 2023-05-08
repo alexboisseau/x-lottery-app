@@ -1,15 +1,7 @@
 import { ethers } from "ethers";
 import "./LotteryCard.scss";
 import { useEffect, useState } from "react";
-import {
-  LOTTERY_CONTRACT_ABI,
-  LOTTERY_CONTRACT_ADDRESS,
-  LOTTERY_ENTRANCE_FEE,
-  SEPOLIA_CHAIN_ID,
-  SEPOLIA_CHAIN_ID_HEX,
-} from "../constants";
-import { GiTicket } from "react-icons/gi";
-import { toast } from "react-hot-toast";
+import { SEPOLIA_CHAIN_ID, SEPOLIA_CHAIN_ID_HEX } from "../constants";
 import { LotteryCardInformations } from "./LotteryCardInformations";
 import { LotteryCardBuyTicketButton } from "./LotteryCardBuyTicketButton";
 
