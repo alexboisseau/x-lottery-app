@@ -1,0 +1,13 @@
+.lottery-card-informations {
+  & > p {
+    margin: 10px;
+
+    & > .label {
+      font-weight: 500;
+    }
+
+    & > .value {
+      font-style: italic;
+    }
+  }
+}

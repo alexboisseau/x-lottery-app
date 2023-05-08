@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import "./LotteryCard.scss";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LOTTERY_CONTRACT_ABI,
   LOTTERY_CONTRACT_ADDRESS,
@@ -8,6 +8,7 @@ import {
 } from "../constants";
 import { GiTicket } from "react-icons/gi";
 import { toast } from "react-hot-toast";
+import { LotteryCardInformations } from "./LotteryCardInformations";
 
 const getWeb3Provider = (): ethers.providers.Web3Provider | null => {
   if (!window.ethereum) return null;
@@ -21,11 +22,7 @@ export const LotteryCard = () => {
   /** STATE VARIABLES */
   const [hasEthereumExtension, setHasEthereumExtension] =
     useState<boolean>(false);
-  const [provider, setProvider] =
-    useState<ethers.providers.Web3Provider | null>(null);
-  const [recentWinner, setRecentWinner] = useState<string>("");
-  const [lotteryBalance, setLotteryBalance] = useState<string>("");
-  const [numberOfPlayers, setNumberOfPlayers] = useState<number>(0);
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
   const [waitingForTxValidation, setWaitingForTxValidation] =
     useState<boolean>(false);
 
@@ -46,63 +43,24 @@ export const LotteryCard = () => {
     }
   };
 
-  const getLotteryBalance = useCallback(async (): Promise<void> => {
-    if (!provider) return;
-
-    try {
-      const balance = await provider.getBalance(LOTTERY_CONTRACT_ADDRESS);
-      setLotteryBalance(ethers.utils.formatEther(balance));
-    } catch (error) {
-      console.log("ERROR on getLotteryBalance method : ", error);
-    }
-  }, [provider]);
-
-  const getNumberOfPlayers = useCallback(async (): Promise<void> => {
-    if (!provider) return;
-
-    try {
-      const contract = getLotteryContract(provider);
-      if (!contract) return;
-
-      const numberOfPlayers = await contract.getNumberOfPlayers();
-      setNumberOfPlayers(numberOfPlayers.toNumber());
-    } catch (error) {
-      console.log("ERROR on getNumberOfPlayers : ", error);
-    }
-  }, [provider]);
-
-  const getRecentWinner = useCallback(async (): Promise<void> => {
-    if (!provider) return;
-
-    try {
-      const contract = getLotteryContract(provider);
-      if (!contract) return;
-
-      setRecentWinner(await contract.getRecentWinner());
-    } catch (error) {
-      console.log("ERROR on getRecentWinner : ", error);
-    }
-  }, [provider]);
-
-  const handleTxValidation = useCallback(
-    (address: string) => {
-      console.log("TICKET BUY BY: ", address);
-      if (!provider) return;
-
-      const contract = getLotteryContract(provider);
-      if (!contract) return;
-
-      getLotteryBalance();
-      getNumberOfPlayers();
-    },
-    [provider, getLotteryBalance, getNumberOfPlayers]
-  );
-
   const buyTicket = async () => {
     if (!provider) return;
 
+    let signer: ethers.providers.JsonRpcSigner;
+
     try {
-      const signer = provider.getSigner();
+      signer = provider.getSigner();
+      await signer.getAddress();
+    } catch (error) {
+      console.log(error);
+      await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      signer = provider.getSigner();
+    }
+
+    try {
       const contract = getLotteryContract(signer);
 
       if (!contract) return;
@@ -115,7 +73,6 @@ export const LotteryCard = () => {
 
       const myPromise = new Promise<void>((resolve, reject) => {
         tx.wait().then((txResult: any) => {
-          console.log("transaction : ", txResult);
           if (txResult.status === 0) {
             reject();
           } else {
@@ -132,7 +89,6 @@ export const LotteryCard = () => {
         error: "Oops ... Transaction failed",
       });
     } catch (error) {
-      console.log("Error during the tx signature");
       setWaitingForTxValidation(false);
     }
   };
@@ -151,45 +107,17 @@ export const LotteryCard = () => {
 
     const contract = getLotteryContract(provider);
     if (!contract) return;
-
-    contract.on("LotteryEnter", (playerAddress: string) => {
-      handleTxValidation(playerAddress);
-    });
-  }, [handleTxValidation, provider]);
-
-  useEffect(() => {
-    getRecentWinner();
-  }, [getRecentWinner]);
-
-  useEffect(() => {
-    getNumberOfPlayers();
-  });
-
-  useEffect(() => {
-    getLotteryBalance();
-  }, [getLotteryBalance]);
+  }, [provider]);
 
   return (
     <div className="lottery-card">
       <h1>Welcome to xLottery !</h1>
 
-      {hasEthereumExtension ? (
+      {!hasEthereumExtension ? (
+        <p>Please, install Metamask</p>
+      ) : (
         <>
-          <div className="informations">
-            <p>
-              <span className="label">Recent winner :</span>{" "}
-              <span className="value">{recentWinner}</span>
-            </p>
-            <p>
-              <span className="label">Current balance :</span>{" "}
-              <span className="value">{lotteryBalance} ETH</span>
-            </p>
-            <p>
-              <span className="label">Number of players for this round :</span>{" "}
-              <span className="value">{numberOfPlayers}</span>
-            </p>
-          </div>
-
+          <LotteryCardInformations provider={provider!} />
           {waitingForTxValidation ? (
             <button className="buy-ticket-button">
               <span>Waiting for the validation of the transaction ...</span>
@@ -202,8 +130,6 @@ export const LotteryCard = () => {
             </button>
           )}
         </>
-      ) : (
-        <p>Please install Metamask to use the dapp</p>
       )}
     </div>
   );

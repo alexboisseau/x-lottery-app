@@ -332,3 +332,7 @@ export const LOTTERY_CONTRACT_ABI = [
     type: "function",
   },
 ];
+
+export enum LOTTERY_CONTRACT_EVENTS {
+  "LotteryEnter" = "LotteryEnter",
+}
